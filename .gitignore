@@ -1,0 +1,4 @@
+server/app/__pycache__/
+server/server-env/
+client/node_modules/
+client/yarn.lock
