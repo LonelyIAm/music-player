@@ -1,6 +1,5 @@
 import { createContext, FC, useContext, useEffect, useState } from "react";
 import { fetchUrl } from "../api/music";
-import MusicItem from "../components/MusicItem";
 
 export type MusicItem = {
   id: number;
@@ -8,10 +7,10 @@ export type MusicItem = {
   title: string;
 };
 
-export type MusicProviderValues = {
+type MusicProviderValues = {
   music: MusicItem[];
-  addMusic: (title: string, url: string) => Promise<string>;
-  removeMusic: (id: number) => void;
+  setMusic: React.Dispatch<React.SetStateAction<MusicItem[]>>;
+  getMusic: (id: number) => MusicItem | undefined;
 };
 
 const MusicContext = createContext<MusicProviderValues | null>(null);
@@ -29,38 +28,42 @@ export const MusicProvider: FC = ({ children }) => {
     localStorage.setItem("music", JSON.stringify(music));
   }, [music]);
 
-  // Function to add music
-  const addMusic = async (title: string, url: string) => {
-    const result = await fetchUrl(url);
-    console.log(result);
-    if (!result.audio) {
-      return result.error as string;
-    } else {
-      const tmp = music.filter(({ title: Title }) => Title === title);
-      console.log(tmp);
-      if (!tmp.length) {
-        setMusic((m) => [
-          ...m,
-          {
-            title,
-            url: result.audio,
-            id: m.length ? m[m.length - 1].id + 1 : 0,
-          },
-        ]);
-        return "success";
-      } else {
-        return `item with title "${title}" already exists`;
-      }
-    }
-  };
-
-  // Function to remove music
-  const removeMusic = (id: number) =>
-    setMusic((m) => m.filter(({ id: Id }) => Id !== id));
+  const getMusic = (id: number) =>
+    music.filter(({ id: Id }) => id === Id).pop();
 
   return (
-    <MusicContext.Provider value={{ music, addMusic, removeMusic }}>
+    <MusicContext.Provider value={{ music, setMusic, getMusic }}>
       {children}
     </MusicContext.Provider>
   );
+};
+
+export const useMusicMutater = () => {
+  const { setMusic } = useMusic()!;
+  const [status, setStatus] = useState<"loading" | "done" | "error" | null>(
+    null
+  );
+
+  const addMusic = async (title: string, url: string) => {
+    setStatus("loading");
+    const result = await fetchUrl(url);
+    if (!result.audio) {
+      setStatus("error");
+    } else {
+      setMusic((m) => [
+        ...m,
+        {
+          title,
+          url: result.audio,
+          id: m.length ? m[m.length - 1].id + 1 : 0,
+        },
+      ]);
+      setStatus("done");
+    }
+  };
+
+  const removeMusic = (id: number) =>
+    setMusic((music) => music.filter(({ id: Id }) => Id !== id));
+
+  return { status, addMusic, removeMusic };
 };

@@ -1,11 +1,16 @@
-import { AddMusic, MusicList } from "./components";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Home, Player } from "./pages";
 
 function App() {
   return (
-    <div>
-      <AddMusic />
-      <MusicList />
-    </div>
+    <Router>
+      <Route path={["/", "/home"]} exact>
+        <Home />
+      </Route>
+      <Route path="/music/:id">
+        <Player />
+      </Route>
+    </Router>
   );
 }
 

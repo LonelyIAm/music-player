@@ -1,11 +1,19 @@
 import React from "react";
-import { MusicItem as MusicItemProps } from "../context/MusicContext";
+import { MdPlayForWork } from "react-icons/md";
+import {
+  MusicItem as MusicItemProps,
+  useMusicMutater,
+} from "../context/MusicContext";
 
 const MusicItem = ({ id, title, url }: MusicItemProps) => {
-  const doSmtg = (e: any) => console.log(e.nativeEvent.target.currentTime);
+  const { removeMusic } = useMusicMutater();
+
   return (
-    <li key={id}>
-      Title: {title} <audio src={url} controls onTimeUpdate={doSmtg}></audio>
+    <li>
+      <button>
+        <MdPlayForWork />
+        {title} <button onClick={() => removeMusic(id)}>X</button>
+      </button>
     </li>
   );
 };

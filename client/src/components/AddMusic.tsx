@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useMusic } from "../context/MusicContext";
+import { useMusicMutater } from "../context/MusicContext";
 
 const AddMusic = () => {
-  const { addMusic } = useMusic()!;
+  const { status, addMusic } = useMusicMutater();
 
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [error, setError] = useState("");
 
   // Handle controlled inputs
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -17,14 +16,14 @@ const AddMusic = () => {
   // Handle form submit
   const handleAddMusic = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const status = await addMusic(title, url);
-    if (status !== "success") setError("an error occured");
-    console.log(status);
+    addMusic(title, url);
+    setUrl("");
+    setTitle("");
   };
 
   return (
     <form onSubmit={handleAddMusic}>
-      {error}
+      {status === "error" && "Error"}
       <input
         type="text"
         placeholder="title"
@@ -39,7 +38,9 @@ const AddMusic = () => {
         onChange={handleUrlChange}
         required
       />
-      <button type="submit">Add</button>
+      <button type="submit">
+        {status !== "loading" ? "Add" : "loading..."}
+      </button>
     </form>
   );
 };
