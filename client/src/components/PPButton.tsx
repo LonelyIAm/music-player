@@ -22,3 +22,5 @@ const PPButton: FC<PPButtonProps> = ({ playing, pause, play }) => {
     </>
   );
 };
+
+export default PPButton;
