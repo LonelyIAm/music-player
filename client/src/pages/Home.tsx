@@ -1,11 +1,11 @@
-import { AddMusic, MusicList } from "../components";
+import { AddMusic, HomeTabs } from "../components";
 
 function Home() {
   return (
     <main>
       <AddMusic />
 
-      <MusicList />
+      <HomeTabs />
     </main>
   );
 }

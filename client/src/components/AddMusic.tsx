@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import { useMusicMutater } from "../context/MusicContext";
 
-const AddMusic = () => {
+const AddMusic: FC = () => {
   const { status, addMusic } = useMusicMutater();
 
   const [url, setUrl] = useState("");
@@ -23,6 +23,7 @@ const AddMusic = () => {
 
   return (
     <form onSubmit={handleAddMusic}>
+      <legend>Add Music</legend>
       {status === "error" && "Error"}
       <input
         type="text"

@@ -1,5 +1,6 @@
 import { createContext, FC, useContext, useEffect, useState } from "react";
 import { fetchUrl } from "../api/music";
+import { usePlaylist } from "./PlaylistContext";
 
 export type MusicItem = {
   id: number;
@@ -40,6 +41,7 @@ export const MusicProvider: FC = ({ children }) => {
 
 export const useMusicMutater = () => {
   const { setMusic } = useMusic()!;
+  const { setPlaylists } = usePlaylist()!;
   const [status, setStatus] = useState<"loading" | "done" | "error" | null>(
     null
   );
@@ -62,8 +64,16 @@ export const useMusicMutater = () => {
     }
   };
 
-  const removeMusic = (id: number) =>
+  const removeMusic = (id: number) => {
     setMusic((music) => music.filter(({ id: Id }) => Id !== id));
+    setPlaylists((playlists) =>
+      playlists.map(({ id, title, music }) => ({
+        id,
+        title,
+        music: music.filter((Id) => id !== Id),
+      }))
+    );
+  };
 
   return { status, addMusic, removeMusic };
 };

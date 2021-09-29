@@ -14,9 +14,12 @@ function Player() {
   const [progress, setProgress] = useState(0);
   const audio = createRef<HTMLAudioElement>();
 
-  const updateTime = (e: any) =>
+  const updateTime = (e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
     setProgress(e.currentTarget.currentTime / e.currentTarget.duration);
-  const resetPlayer = async (e: any) => setStatus("done");
+  };
+  const resetPlayer = () => {
+    setStatus("done");
+  };
   const playAudio = () => {
     console.log("computing");
     audio.current!.play();

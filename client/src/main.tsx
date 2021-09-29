@@ -2,10 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { MusicProvider } from "./context/MusicContext";
+import { PlayListProvider } from "./context/PlaylistContext";
 
 ReactDOM.render(
-  <MusicProvider>
-    <App />
-  </MusicProvider>,
+  <PlayListProvider>
+    <MusicProvider>
+      <App />
+    </MusicProvider>
+  </PlayListProvider>,
   document.getElementById("root")
 );

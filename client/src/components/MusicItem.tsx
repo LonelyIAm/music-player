@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import { MdMoreVert, MdPlayArrow } from "react-icons/md";
 import { Link } from "react-router-dom";
 import {
@@ -6,7 +6,7 @@ import {
   useMusicMutater,
 } from "../context/MusicContext";
 
-const MusicItem = ({ id, title, url }: MusicItemProps) => {
+const MusicItem: FC<MusicItemProps> = ({ id, title, url }) => {
   const { removeMusic } = useMusicMutater();
 
   return (
