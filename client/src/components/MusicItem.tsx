@@ -1,5 +1,6 @@
 import React from "react";
-import { MdPlayForWork } from "react-icons/md";
+import { MdMoreVert, MdPlayArrow } from "react-icons/md";
+import { Link } from "react-router-dom";
 import {
   MusicItem as MusicItemProps,
   useMusicMutater,
@@ -10,9 +11,12 @@ const MusicItem = ({ id, title, url }: MusicItemProps) => {
 
   return (
     <li>
-      <button>
-        <MdPlayForWork />
-        {title} <button onClick={() => removeMusic(id)}>X</button>
+      <Link to={`/music/${id}`}>
+        <MdPlayArrow />
+      </Link>
+      {title}{" "}
+      <button onClick={() => {}}>
+        <MdMoreVert />
       </button>
     </li>
   );

@@ -1,53 +1,70 @@
-import { useEffect, useRef, useState } from "react";
-import { MdMusicVideo } from "react-icons/md";
-import { useParams } from "react-router";
+import { createRef, useState } from "react";
+import { MdArrowBack, MdMusicVideo } from "react-icons/md";
+import { useHistory, useParams } from "react-router";
 import { PPButton } from "../components";
 import { useMusic } from "../context/MusicContext";
 
 function Player() {
+  const history = useHistory();
   const { getMusic } = useMusic()!;
   const { id }: { id: string } = useParams();
   const { title, url } = getMusic(parseInt(id))!;
 
-  const [playing, setPlaying] = useState(false);
+  const [status, setStatus] = useState<"playing" | "paused" | "done">("paused");
   const [progress, setProgress] = useState(0);
-  const audio = useRef(new Audio(url));
+  const audio = createRef<HTMLAudioElement>();
 
-  useEffect(() => {
-    const updateTime = (e: any) =>
-      setProgress(e.currentTarget.currentTime / e.currentTarget.duration);
-    audio.current.addEventListener("timeupdate", updateTime);
-
-    return () => audio.current.removeEventListener("timeupdate", updateTime);
-  }, []);
-
+  const updateTime = (e: any) =>
+    setProgress(e.currentTarget.currentTime / e.currentTarget.duration);
+  const resetPlayer = async (e: any) => setStatus("done");
+  const playAudio = () => {
+    console.log("computing");
+    audio.current!.play();
+    setStatus("playing");
+    console.log("playing");
+  };
+  const pauseAudio = () => {
+    audio.current!.pause();
+    setStatus("paused");
+  };
+  const replayAudio = async () => {
+    audio.current!.currentTime = 0;
+    setProgress(0);
+    playAudio();
+  };
   const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const progress_ = parseInt(e.target.value) / 100;
     setProgress(progress_);
-    audio.current.currentTime = progress_ * audio.current.duration;
-  };
-  const playAudio = async () => {
-    await audio.current.play();
-    setPlaying(true);
-  };
-  const pauseAudio = () => {
-    audio.current.pause();
-    setPlaying(false);
+    audio.current!.currentTime = progress_ * audio.current!.duration;
   };
   const handleProgressChangeRefinementUp = async () => {
-    audio.current.muted = false;
-    await playAudio();
+    audio.current!.muted = false;
+    playAudio();
   };
   const handleProgressChangeRefinementDown = () => {
-    audio.current.muted = true;
+    audio.current!.muted = true;
     pauseAudio();
   };
 
   return (
     <main>
+      <button onClick={history.goBack}>
+        <MdArrowBack />
+      </button>
       <MdMusicVideo size="40%" />
       <h1>{title}</h1>
-      <PPButton playing={playing} pause={pauseAudio} play={playAudio} />
+      <PPButton
+        playing={status}
+        pause={pauseAudio}
+        play={playAudio}
+        replay={replayAudio}
+      />
+      <audio
+        src={url}
+        ref={audio}
+        onTimeUpdate={updateTime}
+        onEnded={resetPlayer}
+      ></audio>
       <input
         type="range"
         value={progress * 100}

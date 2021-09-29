@@ -4,6 +4,7 @@ function Home() {
   return (
     <main>
       <AddMusic />
+
       <MusicList />
     </main>
   );
