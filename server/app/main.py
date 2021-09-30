@@ -1,8 +1,6 @@
-from base64 import urlsafe_b64decode as b64decode
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from urllib.parse import unquote
+from pydantic import BaseModel
 
 from .utils import get_audio
 
@@ -20,15 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Item(BaseModel):
+    srcs: list
 
 
-@app.get("/{video_url}")
-def audio(video_url):
-    print(video_url)
-    return get_audio(unquote(video_url))
-
-
-@app.get("/")
-def home():
-    return "audio -> /base64($video_url_id)"
+@app.post("/")
+def audio(videos: Item):
+    return get_audio(videos.srcs)
 

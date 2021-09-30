@@ -8,7 +8,7 @@ function Player() {
   const history = useHistory();
   const { getMusic } = useMusic()!;
   const { id }: { id: string } = useParams();
-  const { title, url } = getMusic(parseInt(id))!;
+  const { title, parsedUrl: url } = getMusic(parseInt(id))!;
 
   const [status, setStatus] = useState<"playing" | "paused" | "done">("paused");
   const [progress, setProgress] = useState(0);
@@ -21,10 +21,8 @@ function Player() {
     setStatus("done");
   };
   const playAudio = () => {
-    console.log("computing");
     audio.current!.play();
     setStatus("playing");
-    console.log("playing");
   };
   const pauseAudio = () => {
     audio.current!.pause();
