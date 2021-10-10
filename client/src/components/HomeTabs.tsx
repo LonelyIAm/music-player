@@ -1,12 +1,14 @@
 import { FC, useState } from "react";
 import { MusicList, PlayLists } from ".";
+import { useMusicDB } from "../api/musicDB";
 
 type Tabs = "music" | "playlists";
 
 const HomeTabs: FC = () => {
   const [tab, setTab] = useState<Tabs>("music");
+  const songs = useMusicDB();
 
-  const renderTab = () => {
+  const RenderTab = () => {
     switch (tab) {
       case "music":
         return <MusicList />;
@@ -31,7 +33,8 @@ const HomeTabs: FC = () => {
           Playlists
         </li>
       </ul>
-      {renderTab()}
+      {songs && JSON.stringify(songs)}
+      <RenderTab />
     </>
   );
 };

@@ -1,78 +1,28 @@
 import { createContext, FC, useContext, useEffect, useState } from "react";
 import { fetchMusic, fetchUrl, validateUrls } from "../api/music";
+import { ISong, useMusicDB } from "../api/musicDB";
 import { usePlaylist } from "./PlaylistContext";
 
-export type MusicItem = {
-  id: number;
-  url: string;
-  parsedUrl: string;
-  title: string;
+type SongsProviderValues = {
+  songs: ISong[] | null;
+  getMusic: (id: number) => ISong | undefined;
 };
 
-type MusicProviderValues = {
-  music: MusicItem[];
-  setMusic: React.Dispatch<React.SetStateAction<MusicItem[]>>;
-  getMusic: (id: number) => MusicItem | undefined;
-};
+const SongsContext = createContext<SongsProviderValues | null>(null);
 
-const MusicContext = createContext<MusicProviderValues | null>(null);
-
-export const useMusic = () => useContext(MusicContext);
+export const useMusic = () => useContext(SongsContext);
 
 export const MusicProvider: FC = ({ children }) => {
   // Set music state
-  const [loading, setLoading] = useState(false);
-  const [music, setMusic] = useState<MusicItem[]>(
-    JSON.parse(localStorage.getItem("music") || "[]")
-  );
-
-  // Validate and refetch urls
-  useEffect(() => {
-    const main = async () => {
-      const invalid = await validateUrls(
-        music.map(({ id, parsedUrl }) => ({ id, url: parsedUrl }))
-      );
-      if (invalid.length) {
-        const validated = (await fetchMusic(
-          music
-            .filter(({ id }) => invalid.includes(id))
-            .map(({ url, id }) => ({ url, id }))
-        ))!;
-
-        setMusic((ms) =>
-          ms.map(({ id, title, url, parsedUrl }) => {
-            const valid = validated
-              .audios!.filter((a) => Object.keys(a).includes(id.toString()))
-              .pop()!;
-
-            if (valid)
-              return {
-                id,
-                parsedUrl: valid[id],
-                title,
-                url,
-              };
-
-            return { id, title, url, parsedUrl };
-          })
-        );
-      }
-    };
-    main();
-  }, []);
-
-  // Update localStorage from music each time music changes
-  useEffect(() => {
-    localStorage.setItem("music", JSON.stringify(music));
-  }, [music]);
+  const { songs, status } = useMusicDB();
 
   const getMusic = (id: number) =>
-    music.filter(({ id: Id }) => id === Id).pop();
+    songs!.filter(({ id: Id }) => id === Id).pop();
 
   return (
-    <MusicContext.Provider value={{ music, setMusic, getMusic }}>
-      {!loading ? children : "help"}
-    </MusicContext.Provider>
+    <SongsContext.Provider value={{ songs, getMusic }}>
+      {status && status !== "loading" ? children : "help"}
+    </SongsContext.Provider>
   );
 };
 
